@@ -11,8 +11,8 @@ public class VelocimetryMain {
 		SQLConnection sqlConnection = new SQLConnection();
 		sqlConnection.connect("localhost:3306", "velocimetry", "velocimetry_user", "po9KB76BVPh4p:^uOmEn");
 
-		List<File> files_in = getListOfFilesInFolder("raw_data/in(fest)");
-		List<File> files_out = getListOfFilesInFolder("raw_data/out(mobil)");
+		List<File> files_in = getListOfFilesInFolder("speed_data/in(fest)");
+		List<File> files_out = getListOfFilesInFolder("speed_data/out(mobil)");
 
 		DataImporter importer = new DataImporter(sqlConnection);
 		importer.importFromFiles(files_in, Direction.IN);

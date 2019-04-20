@@ -1,9 +1,7 @@
 package de.velocimetry;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 public class SQLConnection {
 
@@ -59,8 +57,8 @@ public class SQLConnection {
 		return success;
 	}
 
-	public List getAllEntrys() {
-		List<SpeedMeasurement> speedMeasurementList = new ArrayList<SpeedMeasurement>();
+	public Map<Integer, List<SpeedMeasurement>> getAllEntrys() {
+		Map<Integer, List<SpeedMeasurement>> speedListMap = new HashMap<Integer, List<SpeedMeasurement>>();
 
 		try {
 			String query = " select * from speed_measurement";
@@ -70,19 +68,27 @@ public class SQLConnection {
 			while (rs.next()) {
 				i++;
 				int id = rs.getInt("id");
-				String date = rs.getString("date");
+				String dateString = rs.getString("date");
+				int date = Integer.parseInt(dateString.replaceAll("-", ""));
 				String time = rs.getString("time");
 				String directionString = rs.getString("direction");
 				Direction direction = (directionString.equals("IN")) ? Direction.IN : Direction.OUT;
 				short speed_in = rs.getShort("speed_in");
 				short speed_out = rs.getShort("speed_out");
 
-				speedMeasurementList.add(new SpeedMeasurement(id, date, time, direction, speed_in, speed_out));
+				SpeedMeasurement sm = new SpeedMeasurement(id, date, time, direction, speed_in, speed_out);
+
+				if (!speedListMap.containsKey(date)) {
+					List<SpeedMeasurement> speedMeasurementList = new ArrayList<SpeedMeasurement>();
+					speedListMap.put(date, speedMeasurementList);
+				}
+
+				speedListMap.get(date).add(sm);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return speedMeasurementList;
+		return speedListMap;
 	}
 
 	public void insertData(List<SpeedMeasurement> entrysToAdd) throws SQLException {
@@ -102,7 +108,7 @@ public class SQLConnection {
 
 		for (int i = 0; i < entrysToAdd.size(); i++) {
 			SpeedMeasurement sm = entrysToAdd.get(i);
-			pstmt.setString(1, sm.date);
+			pstmt.setInt(1, sm.date);
 			pstmt.setString(2, sm.time);
 			String direction = (sm.direction == Direction.IN) ? "IN" : "OUT";
 			pstmt.setString(3, direction);
