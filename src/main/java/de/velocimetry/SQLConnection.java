@@ -57,8 +57,8 @@ public class SQLConnection {
 		return success;
 	}
 
-	public Map<Integer, List<SpeedMeasurement>> getAllEntrys() {
-		Map<Integer, List<SpeedMeasurement>> speedListMap = new HashMap<Integer, List<SpeedMeasurement>>();
+	public Map<Integer, Map<String, List<SpeedMeasurement>>> getAllEntrys() {
+		Map<Integer, Map<String, List<SpeedMeasurement>>> speedMeasurementDateMap = new HashMap<Integer, Map<String, List<SpeedMeasurement>>>();
 
 		try {
 			String query = " select * from speed_measurement";
@@ -78,17 +78,24 @@ public class SQLConnection {
 
 				SpeedMeasurement sm = new SpeedMeasurement(id, date, time, direction, speed_in, speed_out);
 
-				if (!speedListMap.containsKey(date)) {
-					List<SpeedMeasurement> speedMeasurementList = new ArrayList<SpeedMeasurement>();
-					speedListMap.put(date, speedMeasurementList);
+				if (!speedMeasurementDateMap.containsKey(date)) {
+					Map<String, List<SpeedMeasurement>> speedMeasurementMap = new HashMap<String, List<SpeedMeasurement>>();
+					speedMeasurementDateMap.put(date, speedMeasurementMap);
 				}
 
-				speedListMap.get(date).add(sm);
+				Map<String, List<SpeedMeasurement>> speedMeasurementTimeMap = speedMeasurementDateMap.get(sm.date);
+				if (!speedMeasurementDateMap.get(sm.date).containsKey(sm.time)){
+					List<SpeedMeasurement> speedMeasurementList = new ArrayList<SpeedMeasurement>();
+					speedMeasurementTimeMap.put(sm.time, speedMeasurementList);
+				}
+
+				List<SpeedMeasurement> speedMeasurementList = speedMeasurementTimeMap.get(sm.time);
+				speedMeasurementList.add(sm);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return speedListMap;
+		return speedMeasurementDateMap;
 	}
 
 	public void insertData(List<SpeedMeasurement> entrysToAdd) throws SQLException {
