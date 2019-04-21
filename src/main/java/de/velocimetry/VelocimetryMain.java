@@ -11,13 +11,12 @@ public class VelocimetryMain {
 		SQLConnection sqlConnection = new SQLConnection();
 		sqlConnection.connect("localhost:3306", "velocimetry", "velocimetry_user", "po9KB76BVPh4p:^uOmEn");
 
-		List<File> files_in = getListOfFilesInFolder("speed_data/in(fest)");
-		List<File> files_out = getListOfFilesInFolder("speed_data/out(mobil)");
+		List<File> files_fest = getListOfFilesInFolder("speed_data/in(fest)");
+		List<File> files_mobil = getListOfFilesInFolder("speed_data/out(mobil)");
 
 		DataImporter importer = new DataImporter(sqlConnection);
-		importer.importFromFiles(files_in, Direction.IN);
-		importer.importFromFiles(files_out, Direction.OUT);
-
+		importer.importFromFiles(files_fest, Device.FEST);
+		importer.importFromFiles(files_mobil, Device.MOBIL);
 	}
 
 	private static List<File> getListOfFilesInFolder(String path){

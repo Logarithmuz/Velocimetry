@@ -21,12 +21,12 @@ public class DataImporter {
 		System.out.println("Loaded Database, took " + (System.currentTimeMillis() - startTime) + "ms\n");
 	}
 
-	public boolean importFromFiles(List<File> files, Direction direction) {
+	public boolean importFromFiles(List<File> files, Device device) {
 		boolean success = false;
 		List<SpeedMeasurement> entrysToAdd = new ArrayList<SpeedMeasurement>();
 		long startTime = System.currentTimeMillis();
 
-		System.out.println("Reading files for direction: " + direction.toString());
+		System.out.println("Reading files for device: " + device.toString());
 		for (File file : files) {
 			try {
 				BufferedReader in = new BufferedReader(new FileReader(file));
@@ -38,7 +38,7 @@ public class DataImporter {
 					short speed_in = Short.parseShort(tokens[2]);
 					short speed_out = Short.parseShort(tokens[4]);
 
-					SpeedMeasurement sm = new SpeedMeasurement(date, time, direction, speed_in, speed_out);
+					SpeedMeasurement sm = new SpeedMeasurement(date, time, device, speed_in, speed_out);
 					// todo: optimize comparison
 					if (!isInDb(sm)) {
 						entrysToAdd.add(sm);
