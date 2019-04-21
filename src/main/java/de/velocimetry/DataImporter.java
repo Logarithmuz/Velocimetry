@@ -3,6 +3,7 @@ package de.velocimetry;
 import java.sql.SQLException;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -10,7 +11,7 @@ import java.util.regex.Pattern;
 public class DataImporter {
 
 	private SQLConnection sqlConnection;
-	private Map<Integer, List<SpeedMeasurement>> speedMeasurements;
+	private Map<Integer, Map<String, List<SpeedMeasurement>>> speedMeasurementDateMap;
 
 	public DataImporter(SQLConnection sqlConnection) {
 		super();
@@ -41,7 +42,7 @@ public class DataImporter {
 					// todo: optimize comparison
 					if (!isInDb(sm)) {
 						entrysToAdd.add(sm);
-						speedMeasurements.get(date).add(sm);
+						speedMeasurementDateMap.get(date).get(time).add(sm);
 					}
 				}
 
@@ -62,16 +63,23 @@ public class DataImporter {
 	}
 
 	private boolean isInDb(SpeedMeasurement sm) {
-		if (!speedMeasurements.containsKey(sm.date)) {
-			speedMeasurements.put(sm.date, new ArrayList<SpeedMeasurement>());
+		if (!speedMeasurementDateMap.containsKey(sm.date)) {
+			speedMeasurementDateMap.put(sm.date, new HashMap<String, List<SpeedMeasurement>>());
+		}
+
+		Map<String, List<SpeedMeasurement>> speedMeasurementTimeMap = speedMeasurementDateMap.get(sm.date);
+		if (!speedMeasurementTimeMap.containsKey(sm.time)) {
+			speedMeasurementTimeMap.put(sm.time, new ArrayList<SpeedMeasurement>());
 			return false;
 		}
-		List<SpeedMeasurement> speedMeasurementList = speedMeasurements.get(sm.date);
+
+		List<SpeedMeasurement> speedMeasurementList = speedMeasurementTimeMap.get(sm.time);
 		for (SpeedMeasurement speedMeasurementEntry : speedMeasurementList) {
 			if (speedMeasurementEntry.equals(sm)) {
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -85,7 +93,7 @@ public class DataImporter {
 	}
 
 	private void loadDatabase() {
-		speedMeasurements = sqlConnection.getAllEntrys();
+		speedMeasurementDateMap = sqlConnection.getAllEntrys();
 	}
 
 }
