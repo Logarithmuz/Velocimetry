@@ -54,12 +54,22 @@ public class DataImporter {
 		System.out.println("	Found " + entrysToAdd.size() + " entries that need to be inserted, took " + (System.currentTimeMillis() - startTime) + "ms");
 
 		try {
-			sqlConnection.insertData(entrysToAdd);
+			insertDataInBlocks(entrysToAdd, 10000);
 			success = true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return success;
+	}
+
+	private void insertDataInBlocks(List<SpeedMeasurement> entrysToAdd, int blockSize) throws SQLException {
+		while (entrysToAdd.size()>blockSize){
+			List<SpeedMeasurement> sublist = entrysToAdd.subList(0, blockSize);
+			sqlConnection.insertData(sublist);
+			entrysToAdd.removeAll(sublist);
+		}
+		//add the rest
+		sqlConnection.insertData(entrysToAdd);
 	}
 
 	private boolean isInDb(SpeedMeasurement sm) {
