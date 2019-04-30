@@ -14,10 +14,17 @@ public class SQLConnection {
 	public void connect(String server, String database, String user, String password) {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			String options = "useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+			String options = "useUnicode=true&" +
+					"useJDBCCompliantTimezoneShift=true&" +
+					"useLegacyDatetimeCode=false&" +
+					"serverTimezone=UTC&" +
+					"useServerPrepStmts=false&" +
+					"rewriteBatchedStatements=true&" +
+					"useCompression=true";
 			con = DriverManager.getConnection("jdbc:mysql://" + server + "/" + database + "?" + options, user, password);
 			System.out.println("Connection established\n");
 		} catch (Exception e) {
+			System.out.println("Please make sure your database is running");
 			System.out.println(e);
 		}
 	}
@@ -75,7 +82,7 @@ public class SQLConnection {
 				}
 
 				Map<String, List<SpeedMeasurement>> speedMeasurementTimeMap = speedMeasurementDateMap.get(sm.date);
-				if (!speedMeasurementDateMap.get(sm.date).containsKey(sm.time)){
+				if (!speedMeasurementDateMap.get(sm.date).containsKey(sm.time)) {
 					List<SpeedMeasurement> speedMeasurementList = new ArrayList<SpeedMeasurement>();
 					speedMeasurementTimeMap.put(sm.time, speedMeasurementList);
 				}
