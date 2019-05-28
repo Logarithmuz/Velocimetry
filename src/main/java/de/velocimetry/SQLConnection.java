@@ -61,34 +61,34 @@ public class SQLConnection {
 		Map<Integer, Map<String, List<SpeedMeasurement>>> speedMeasurementDateMap = new HashMap<Integer, Map<String, List<SpeedMeasurement>>>();
 
 		String query = " select * from speed_measurement";
-		ResultSet rs = null;
 		try (Statement stmt = con.createStatement()) {
-			rs = stmt.executeQuery(query);
+			try (ResultSet rs = stmt.executeQuery(query)){
 
-			while (rs.next()) {
-				int id = rs.getInt("id");
-				String dateString = rs.getString("date");
-				int date = Integer.parseInt(dateString.replaceAll("-", ""));
-				String time = rs.getString("time");
-				Device device = Device.getDevice(rs.getString("device"));
-				short speed_in = rs.getShort("speed_in");
-				short speed_out = rs.getShort("speed_out");
+				while (rs.next()) {
+					int id = rs.getInt("id");
+					String dateString = rs.getString("date");
+					int date = Integer.parseInt(dateString.replaceAll("-", ""));
+					String time = rs.getString("time");
+					Device device = Device.getDevice(rs.getString("device"));
+					short speed_in = rs.getShort("speed_in");
+					short speed_out = rs.getShort("speed_out");
 
-				SpeedMeasurement sm = new SpeedMeasurement(id, date, time, device, speed_in, speed_out);
+					SpeedMeasurement sm = new SpeedMeasurement(id, date, time, device, speed_in, speed_out);
 
-				if (!speedMeasurementDateMap.containsKey(date)) {
-					Map<String, List<SpeedMeasurement>> speedMeasurementMap = new HashMap<String, List<SpeedMeasurement>>();
-					speedMeasurementDateMap.put(date, speedMeasurementMap);
+					if (!speedMeasurementDateMap.containsKey(date)) {
+						Map<String, List<SpeedMeasurement>> speedMeasurementMap = new HashMap<String, List<SpeedMeasurement>>();
+						speedMeasurementDateMap.put(date, speedMeasurementMap);
+					}
+
+					Map<String, List<SpeedMeasurement>> speedMeasurementTimeMap = speedMeasurementDateMap.get(sm.date);
+					if (!speedMeasurementDateMap.get(sm.date).containsKey(sm.time)) {
+						List<SpeedMeasurement> speedMeasurementList = new ArrayList<SpeedMeasurement>();
+						speedMeasurementTimeMap.put(sm.time, speedMeasurementList);
+					}
+
+					List<SpeedMeasurement> speedMeasurementList = speedMeasurementTimeMap.get(sm.time);
+					speedMeasurementList.add(sm);
 				}
-
-				Map<String, List<SpeedMeasurement>> speedMeasurementTimeMap = speedMeasurementDateMap.get(sm.date);
-				if (!speedMeasurementDateMap.get(sm.date).containsKey(sm.time)) {
-					List<SpeedMeasurement> speedMeasurementList = new ArrayList<SpeedMeasurement>();
-					speedMeasurementTimeMap.put(sm.time, speedMeasurementList);
-				}
-
-				List<SpeedMeasurement> speedMeasurementList = speedMeasurementTimeMap.get(sm.time);
-				speedMeasurementList.add(sm);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
