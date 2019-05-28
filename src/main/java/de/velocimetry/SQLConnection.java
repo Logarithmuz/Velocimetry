@@ -13,7 +13,6 @@ public class SQLConnection {
 
 	public void connect(String server, String database, String user, String password) {
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
 			String options = "useUnicode=true&" +
 					"useJDBCCompliantTimezoneShift=true&" +
 					"useLegacyDatetimeCode=false&" +
@@ -58,7 +57,7 @@ public class SQLConnection {
 	}
 
 	public Map<Integer, Map<String, List<SpeedMeasurement>>> getAllEntrys() {
-		Map<Integer, Map<String, List<SpeedMeasurement>>> speedMeasurementDateMap = new HashMap<Integer, Map<String, List<SpeedMeasurement>>>();
+		Map<Integer, Map<String, List<SpeedMeasurement>>> speedMeasurementDateMap = new HashMap<>();
 
 		String query = " select * from speed_measurement";
 		try (Statement stmt = con.createStatement()) {
@@ -76,13 +75,13 @@ public class SQLConnection {
 					SpeedMeasurement sm = new SpeedMeasurement(id, date, time, device, speed_in, speed_out);
 
 					if (!speedMeasurementDateMap.containsKey(date)) {
-						Map<String, List<SpeedMeasurement>> speedMeasurementMap = new HashMap<String, List<SpeedMeasurement>>();
+						Map<String, List<SpeedMeasurement>> speedMeasurementMap = new HashMap<>();
 						speedMeasurementDateMap.put(date, speedMeasurementMap);
 					}
 
 					Map<String, List<SpeedMeasurement>> speedMeasurementTimeMap = speedMeasurementDateMap.get(sm.date);
 					if (!speedMeasurementDateMap.get(sm.date).containsKey(sm.time)) {
-						List<SpeedMeasurement> speedMeasurementList = new ArrayList<SpeedMeasurement>();
+						List<SpeedMeasurement> speedMeasurementList = new ArrayList<>();
 						speedMeasurementTimeMap.put(sm.time, speedMeasurementList);
 					}
 
