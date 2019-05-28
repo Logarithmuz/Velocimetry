@@ -28,6 +28,12 @@ public class SpeedMeasurement {
 
 	@Override
 	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+
+		if (this.getClass() != o.getClass())
+			return false;
+
 		SpeedMeasurement sm = (SpeedMeasurement) o;
 		return (sm.date == this.date)
 				&& (sm.time.equals(this.time))
