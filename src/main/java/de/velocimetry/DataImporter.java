@@ -28,9 +28,7 @@ public class DataImporter {
 
 		System.out.println("Reading files for device: " + device.toString());
 		for (File file : files) {
-			try {
-				BufferedReader in = new BufferedReader(new FileReader(file));
-
+			try (BufferedReader in = new BufferedReader(new FileReader(file))) {
 				for (String line = in.readLine(); line != null; line = in.readLine()) {
 					String[] tokens = line.split(" ");
 					int date = parseDate(tokens[0]);
@@ -45,7 +43,6 @@ public class DataImporter {
 						speedMeasurementDateMap.get(date).get(time).add(sm);
 					}
 				}
-
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

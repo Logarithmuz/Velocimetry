@@ -26,13 +26,13 @@ public class SpeedMeasurement {
 		this.speed_out = speed_out;
 	}
 
-	public boolean equals(SpeedMeasurement sm) {
+	@Override
+	public boolean equals(Object o) {
+		SpeedMeasurement sm = (SpeedMeasurement) o;
 		return (sm.date == this.date)
 				&& (sm.time.equals(this.time))
 				&& (sm.device == this.device)
 				&& (sm.speed_in == this.speed_in)
 				&& (sm.speed_out == this.speed_out);
 	}
-
-
 }
