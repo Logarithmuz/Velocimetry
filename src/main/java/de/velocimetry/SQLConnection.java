@@ -33,15 +33,15 @@ public class SQLConnection {
 		boolean success = false;
 		System.out.println("Date: " + calendar.getTime().toString() + ", speed_in: " + speed_in + ", speed_out: " + speed_out);
 
-		try {
-			Object param = new java.sql.Timestamp(calendar.getTime().getTime());
 
-			// the mysql insert statement
-			String query = " insert into speed_measurement (datetime, device, speed_in, speed_out)"
-					+ " values (?, ?, ?, ?)";
+		Object param = new java.sql.Timestamp(calendar.getTime().getTime());
 
-			// create the mysql insert preparedstatement
-			PreparedStatement preparedStmt = con.prepareStatement(query);
+		// the mysql insert statement
+		String query = " insert into speed_measurement (datetime, device, speed_in, speed_out)"
+				+ " values (?, ?, ?, ?)";
+
+		// create the mysql insert preparedstatement
+		try (PreparedStatement preparedStmt = con.prepareStatement(query)) {
 
 			preparedStmt.setObject(1, param);
 			preparedStmt.setString(2, device.toString());
@@ -53,19 +53,19 @@ public class SQLConnection {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+
 		return success;
 	}
 
 	public Map<Integer, Map<String, List<SpeedMeasurement>>> getAllEntrys() {
 		Map<Integer, Map<String, List<SpeedMeasurement>>> speedMeasurementDateMap = new HashMap<Integer, Map<String, List<SpeedMeasurement>>>();
 
-		try {
-			String query = " select * from speed_measurement";
-			Statement stmt = con.createStatement();
-			ResultSet rs = stmt.executeQuery(query);
-			int i = 0;
+		String query = " select * from speed_measurement";
+		ResultSet rs = null;
+		try (Statement stmt = con.createStatement()) {
+			rs = stmt.executeQuery(query);
+
 			while (rs.next()) {
-				i++;
 				int id = rs.getInt("id");
 				String dateString = rs.getString("date");
 				int date = Integer.parseInt(dateString.replaceAll("-", ""));
@@ -90,43 +90,47 @@ public class SQLConnection {
 				List<SpeedMeasurement> speedMeasurementList = speedMeasurementTimeMap.get(sm.time);
 				speedMeasurementList.add(sm);
 			}
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return speedMeasurementDateMap;
 	}
 
-	public void insertData(List<SpeedMeasurement> entrysToAdd) throws SQLException {
+	public void insertData(List<SpeedMeasurement> entrysToAdd) {
 		// Create SQL statement
 		String SQL = "INSERT INTO speed_measurement (date, time, device, speed_in, speed_out) " +
 				"VALUES(?, ?, ?, ?, ?)";
 
 		// Create PrepareStatement object
-		PreparedStatement pstmt = con.prepareStatement(SQL);
+		long startTime;
+		try (PreparedStatement pstmt = con.prepareStatement(SQL)) {
 
-		//Set auto-commit to false
-		con.setAutoCommit(false);
+			//Set auto-commit to false
+			con.setAutoCommit(false);
 
-		System.out.println("Inserting data into database");
-		System.out.println("	(this could take several minutes depending on your PC and amount of entries)");
-		long startTime = System.currentTimeMillis();
+			System.out.println("Inserting data into database");
+			System.out.println("	(this could take several minutes depending on your PC and amount of entries)");
+			startTime = System.currentTimeMillis();
 
-		for (int i = 0; i < entrysToAdd.size(); i++) {
-			SpeedMeasurement sm = entrysToAdd.get(i);
-			pstmt.setInt(1, sm.date);
-			pstmt.setString(2, sm.time);
-			pstmt.setString(3, sm.device.toString());
-			pstmt.setInt(4, sm.speed_in);
-			pstmt.setInt(5, sm.speed_out);
-			// Add it to the batch
-			pstmt.addBatch();
+			for (int i = 0; i < entrysToAdd.size(); i++) {
+				SpeedMeasurement sm = entrysToAdd.get(i);
+				pstmt.setInt(1, sm.date);
+				pstmt.setString(2, sm.time);
+				pstmt.setString(3, sm.device.toString());
+				pstmt.setInt(4, sm.speed_in);
+				pstmt.setInt(5, sm.speed_out);
+				// Add it to the batch
+				pstmt.addBatch();
+			}
+			//Create an int[] to hold returned values
+			int[] count = pstmt.executeBatch();
+
+			//Explicitly commit statements to apply changes
+			con.commit();
+			System.out.println("Commit executed\n" +
+					"	inserted " + entrysToAdd.size() + " entries, took " + (System.currentTimeMillis() - startTime) + "ms\n");
+		} catch (SQLException e){
+			e.printStackTrace();
 		}
-		//Create an int[] to hold returned values
-		int[] count = pstmt.executeBatch();
-
-		//Explicitly commit statements to apply changes
-		con.commit();
-		System.out.println("Commit executed\n" +
-				"	inserted " + entrysToAdd.size() + " entries, took " + (System.currentTimeMillis() - startTime) + "ms\n");
 	}
 }
