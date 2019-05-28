@@ -39,7 +39,7 @@ public class VelocimetryMain {
 	}
 
 	private static List<File> getListOfFilesInFolder(final File folder) {
-		List<File> files = new ArrayList<File>();
+		List<File> files = new ArrayList<>();
 		for (final File fileEntry : folder.listFiles()) {
 			if (fileEntry.isDirectory()) {
 				files.addAll(getListOfFilesInFolder(fileEntry));

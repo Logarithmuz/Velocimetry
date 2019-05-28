@@ -23,7 +23,7 @@ public class DataImporter {
 
 	public boolean importFromFiles(List<File> files, Device device) {
 		boolean success = false;
-		List<SpeedMeasurement> entrysToAdd = new ArrayList<SpeedMeasurement>();
+		List<SpeedMeasurement> entrysToAdd = new ArrayList<>();
 		long startTime = System.currentTimeMillis();
 
 		System.out.println("Reading files for device: " + device.toString());
