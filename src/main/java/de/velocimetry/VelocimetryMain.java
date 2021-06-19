@@ -44,7 +44,8 @@ public class VelocimetryMain {
 			if (fileEntry.isDirectory()) {
 				files.addAll(getListOfFilesInFolder(fileEntry));
 			} else {
-				files.add(fileEntry);
+				if (!fileEntry.getName().equals("wave.log"))
+					files.add(fileEntry);
 			}
 		}
 		return files;
