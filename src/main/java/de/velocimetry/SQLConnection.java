@@ -108,8 +108,6 @@ public class SQLConnection {
 			//Set auto-commit to false
 			con.setAutoCommit(false);
 
-			System.out.println("Inserting data into database");
-			System.out.println("	(this could take several minutes depending on your PC and amount of entries)");
 			startTime = System.currentTimeMillis();
 
 			for (int i = 0; i < entrysToAdd.size(); i++) {
@@ -127,8 +125,7 @@ public class SQLConnection {
 
 			//Explicitly commit statements to apply changes
 			con.commit();
-			System.out.println("Commit executed\n" +
-					"	inserted " + entrysToAdd.size() + " entries, took " + (System.currentTimeMillis() - startTime) + "ms\n");
+			System.out.println("Successfully inserted " + entrysToAdd.size() + " entries, took " + (System.currentTimeMillis() - startTime) + "ms");
 		} catch (SQLException e){
 			e.printStackTrace();
 		}
