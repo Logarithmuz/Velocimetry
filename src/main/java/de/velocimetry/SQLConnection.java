@@ -13,6 +13,7 @@ public class SQLConnection {
 
 	public void connect(String server, String database, String user, String password) {
 		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
 			String options = "useUnicode=true&" +
 					"useJDBCCompliantTimezoneShift=true&" +
 					"useLegacyDatetimeCode=false&" +
